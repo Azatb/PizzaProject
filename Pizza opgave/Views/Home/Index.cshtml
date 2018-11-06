@@ -1,0 +1,96 @@
+﻿@model Pizza_opgave.Models.PizzaViewModel
+@{
+    ViewBag.Title = "Leonardos pizzaria";
+}
+<style>
+    table td .btn-warning {
+        padding: 0px 4px;
+        margin-left: 5px;
+    }
+</style>
+<div class="row">
+    <div class="col-md-8">
+        <div class="wrap-box">
+            <h4>Pizza</h4>
+
+            <table class="table table-borderless"> 
+                <tbody>
+                @foreach (var pizza in Model.Pizzas)
+                {
+                 
+                        <tr>
+                            <td>@pizza.name <br /> <small>@pizza.topping</small></td>
+                            <td style="vertical-align: middle;width: 100px;"><button class="btn btn-primary" onclick="AddToBucket(@pizza.id, '@pizza.name', '@pizza.topping', @pizza.alm)">Alm: @pizza.alm ,-</button></td>
+                            <td style="vertical-align: middle;width: 100px;"><button class="btn btn-primary" onclick="AddToBucket(@pizza.id, '@pizza.name', '@pizza.topping', @pizza.fam)">Fam @pizza.fam ,-</button></td>
+                        </tr>
+                   
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="wrap-box">
+            <h4>Indkøbskurv</h4>
+
+            @if (Model.OrderdPizza != null)
+            {
+
+                if (Model.OrderdPizza.Any())
+                {
+                    <table class="table table-borderless">
+                        
+                        <tbody>
+                        @foreach (var pizza in Model.OrderdPizza)
+                        {
+                            <tr>
+                                <td>@pizza.name <br />  <small>@pizza.topping</small></td>
+                                <td style="width: 2px;text-align: right;vertical-align: middle;">@pizza.price</td>
+                                <td style="width: 2px;text-align: right;vertical-align: middle;"><button class="btn btn-link" onclick="RemoveFromBucket(@pizza.id)">x</button></td>
+                            </tr>
+                        }
+                
+                            <tr style="font-weight:bold">
+                                <td>Total pris</td>
+                                <td style="width: 2px;text-align: right;vertical-align: middle;">@Model.OrderdPizza.Sum(pizza => pizza.price)</td>
+                                <td style="width: 2px;text-align: right;vertical-align: middle;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <h6>Du har ikke valgt nogen pizza'er</h6>
+                }
+
+            }
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function AddToBucket(id, name, topping, price) {
+
+        $.ajax({
+            url: "/home/AddToBucket",
+            type: "POST",
+            data: { pizzaId: id, pizzaName: name, pizzaTopping: topping, price: price },
+            success: function(data) {
+                location.reload();
+            }});
+
+    }
+
+    function RemoveFromBucket(id) {
+
+        $.ajax({
+            url: "/home/RemoveFromBucket",
+            type: "POST",
+            data: { pizzaId: id },
+            success: function(data) {
+                location.reload();
+            }});
+
+    }
+</script>
